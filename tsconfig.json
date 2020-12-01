@@ -4,6 +4,7 @@
       "noImplicitAny": true,
       "noImplicitReturns": true,
       "strictNullChecks": true,
+      "moduleResolution": "node",
       "strictPropertyInitialization": true,
       "strictBindCallApply": true,
       "noUnusedLocals": true,
