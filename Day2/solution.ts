@@ -50,8 +50,18 @@ const evaluateEntry = (passwordEntry: PasswordEntry): boolean => {
 
 const validEntries = passwordEntries.reduce((a, e) => a + (evaluateEntry(e)? 1: 0 ), 0);
 
-console.log(`Valid entries: ${validEntries}`);
+console.log(`Part 1 - Valid entries: ${validEntries}`);
 
+const evaluateEntryBasedOnNewRule = (passwordEntry: PasswordEntry): boolean => {
+    const firstLocationContainsCharacter: boolean = passwordEntry.entry[passwordEntry.restriction.restrictionLowerBound - 1] == passwordEntry.restriction.restrictionCharacter;
+    const secondLocationContainsCharacter: boolean = passwordEntry.entry[passwordEntry.restriction.restrictionUpperBound - 1] == passwordEntry.restriction.restrictionCharacter;
+
+    return (firstLocationContainsCharacter != secondLocationContainsCharacter) && (firstLocationContainsCharacter || secondLocationContainsCharacter);
+};
+
+const validEntriesByNewRule = passwordEntries.reduce((a, e) => a + (evaluateEntryBasedOnNewRule(e)? 1: 0 ), 0);
+
+console.log(`Part 2 - Valid entries based on the new rule: ${validEntriesByNewRule}`);
 
 
 
