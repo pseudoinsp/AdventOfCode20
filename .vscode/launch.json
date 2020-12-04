@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "Run Script: day4",
+            "request": "launch",
+            "command": "npm run day4",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
