@@ -19,6 +19,10 @@ const processInstructions = (instructions: string): number => {
 };
 
 let maxSeatValue = -1;
+let maxRow = -1;
+let minRow = 9999;
+const collectedSeatValues = new Set<number>();
+
 for(const instructions of lines) {
     const rowInstructions = instructions.substring(0, instructions.length - 3);
     const seatInstrunctions = instructions.substring(instructions.length - 3, instructions.length);
@@ -26,8 +30,21 @@ for(const instructions of lines) {
     const rowNumber = processInstructions(rowInstructions);
     const seatNumber = processInstructions(seatInstrunctions);
 
+    maxRow = Math.max(maxRow, rowNumber);
+    minRow = Math.min(minRow, rowNumber);
+
     const seatValue = rowNumber*8 + seatNumber;
-    maxSeatValue = maxSeatValue > seatValue ? maxSeatValue : seatValue;
+    collectedSeatValues.add(seatValue);
+    maxSeatValue = Math.max(maxSeatValue, seatValue);
 }
 
 console.log(`Part 1 - Max seat value: ${maxSeatValue}`);
+
+// part2
+for (let i = minRow; i <= maxRow; i++) {
+    for (let j = 0; j <= 7; j++) {
+        const seatValue = i*8 + j;
+        if(!collectedSeatValues.has(seatValue))
+            console.log(`Part 2 - seat candidate: row ${i} seat ${j} value ${seatValue}`);
+    }
+}
