@@ -3,9 +3,9 @@
     "configurations": [
         {
             "type": "node-terminal",
-            "name": "Run Script: day5",
+            "name": "Run Script: day6",
             "request": "launch",
-            "command": "npm run day5",
+            "command": "npm run day6",
             "cwd": "${workspaceFolder}"
         }
     ]
