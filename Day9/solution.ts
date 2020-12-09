@@ -16,17 +16,39 @@ const checkPreample = (checkedIndex: number): boolean => {
     return false;
 };
 
+let wrongNumber = -1;
+
 for (let i = preambleSize; i < numbers.length; i++) {
     if(!checkPreample(i)) {
         console.log(`Part 1 - first wrong number: ${i}: ${numbers[i]}`);
+        wrongNumber = numbers[i];
         break;
+    }
+}
+
+// part 2
+outerloop: for (let i = 0; i < numbers.length; i++) {
+    let currentSum = numbers[i];
+
+    for (let j = i + 1; j < numbers.length; j++) {
+        currentSum += numbers[j];
+
+        if(currentSum === wrongNumber) {
+            const subArray = numbers.slice(i, j);
+            const maxOfSubArray = subArray.reduce((a, e) => a = e > a ? e : a, numbers[i]);
+            const minOfSubArray = subArray.reduce((a, e) => a = e < a ? e : a, numbers[i]);
+            console.log(`Part 2 - Sum of min and max in array: ${maxOfSubArray + minOfSubArray}`);
+            break;
+        }
+        else if(currentSum > wrongNumber) {
+            continue outerloop;
+        }
     }
 }
 
 // Part 1 more effective solution init
 // const sumsAndFrequencies = new Map<number, number>();
 // const numbersAndComposedSums = new Array<[number, Array<number>]>();
-
 
 // for (let i = 0; i < preambleSize; i++) {
 //     const allSumsWithNumber = new Array<number>();
@@ -48,4 +70,3 @@ for (let i = preambleSize; i < numbers.length; i++) {
 
 // console.log(numbersAndComposedSums.length);
 // console.log(sumsAndFrequencies.size);
-
