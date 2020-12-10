@@ -31,7 +31,7 @@ variationsUntilNthAdapter[1] = 1;
 variationsUntilNthAdapter[2] = numbers[2] - numbers[0] <= 3 ? 2 : 1;
 
 for (let i = 3; i < numbers.length; i++) {
-    // this adapter can be reached from all tree previous adapter
+    // this adapter can be reached from all three previous adapters
     if(numbers[i] - 3 === numbers[i-3])
         variationsUntilNthAdapter[i] = variationsUntilNthAdapter[i-3]+variationsUntilNthAdapter[i-2]+variationsUntilNthAdapter[i-1];
     // can be reached from the two previous numbers adapters
