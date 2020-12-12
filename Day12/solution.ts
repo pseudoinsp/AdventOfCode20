@@ -4,7 +4,7 @@ import { readLines } from '../utils/inputReader';
 const instructions : string[] = readLines('Day12\\input.txt');
 
 const currentPosition = [0, 0];
-let currentDirection = "E";
+let waypointPositionFromShip = [10, 1];
 
 const GetChange = (quarter: string, value: number): number[] => {
     switch (quarter) {
@@ -21,23 +21,22 @@ const GetChange = (quarter: string, value: number): number[] => {
     }
 };
 
-const directionMapping = new Map<string, number>();
-directionMapping.set("N", 0);
-directionMapping.set("E", 90);
-directionMapping.set("S", 180);
-directionMapping.set("W", 270);
+const GetWaypointPosition = (currentPosition: number[], rotateTo: string, rotationValue: number): number[] => {
+        // use matrix rotation next time...
+        let rotationValueFinal = rotationValue % 360;
+        if(rotateTo === "L")
+            rotationValueFinal = 360 - rotationValueFinal;
 
-const GetNewDirection = (currentDirection: string, rotateTo: string, rotationValue: number): string => {
-    const rotationValueFinal = rotationValue % 360;
-
-    const current = directionMapping.get(currentDirection) || 0;
-    const newCurrent = rotateTo ===  "L" ? current - rotationValueFinal : current + rotationValueFinal;
-
-    let newCurrentFinal = newCurrent % 360;
-    if(newCurrentFinal < 0)
-        newCurrentFinal = Math.abs(-360 - newCurrentFinal);
-    const newDirection = [...directionMapping].filter(x => x[1] === newCurrentFinal)[0][0];
-    return newDirection;
+        switch (rotationValueFinal) {
+            case 90:
+                return [currentPosition[1], -1*currentPosition[0]];
+            case 180:
+                return [-1*currentPosition[0], -1*currentPosition[1]];
+            case 270:
+                return [-1*currentPosition[1], currentPosition[0]];
+            default:
+                throw exception;
+        }
 };
 
 for(const instr of instructions) {
@@ -50,21 +49,21 @@ for(const instr of instructions) {
         case "E":
         case "W":
             const change = GetChange(instrName, instrValue);
-            currentPosition[0] += change[0];
-            currentPosition[1] += change[1];
+            waypointPositionFromShip[0] += change[0];
+            waypointPositionFromShip[1] += change[1];
             break;
         case "L":
         case "R":
-            currentDirection = GetNewDirection(currentDirection, instrName, instrValue);
+            const newPosition = GetWaypointPosition(waypointPositionFromShip, instrName, instrValue);
+            waypointPositionFromShip = newPosition;
             break;
         case "F":
-            const change2 = GetChange(currentDirection, instrValue);
-            currentPosition[0] += change2[0];
-            currentPosition[1] += change2[1];
+            currentPosition[0] += instrValue * waypointPositionFromShip[0];
+            currentPosition[1] += instrValue * waypointPositionFromShip[1];
             break;
         default:
             break;
     }
 }
 
-console.log(`Part 1 - Movement from starting position: ${Math.abs(currentPosition[0]) + Math.abs(currentPosition[1])}`);
+console.log(`Part 2 - Movement from starting position: ${Math.abs(currentPosition[0]) + Math.abs(currentPosition[1])}`);
