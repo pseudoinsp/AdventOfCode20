@@ -9,22 +9,26 @@ lines.map(x => seats.push([...x]));
 const getNeighbours = (seats: string[][], x: number, y: number): number => {
     let neighbours = 0;
 
-    if (x > 0 && y > 0)
-        neighbours = neighbours + (seats[x - 1][y - 1] === "#" ? 1 : 0);
-    if (y > 0)
-        neighbours = neighbours + (seats[x][y - 1] === "#" ? 1 : 0);
-    if (x < seats.length - 1 && y > 0)
-        neighbours = neighbours + (seats[x + 1][y - 1] === "#" ? 1 : 0);
-    if (x > 0)
-        neighbours = neighbours + (seats[x - 1][y] === "#" ? 1 : 0);
-    if (x < seats.length - 1)
-        neighbours = neighbours + (seats[x + 1][y] === "#" ? 1 : 0);
-    if (x > 0 && y < seats[0].length - 1)
-        neighbours = neighbours + (seats[x - 1][y + 1] === "#" ? 1 : 0);
-    if (y < seats[0].length - 1)
-        neighbours = neighbours + (seats[x][y + 1] === "#" ? 1 : 0);
-    if (x < seats.length - 1 && y < seats[0].length - 1)
-        neighbours = neighbours + (seats[x + 1][y + 1] === "#" ? 1 : 0);
+    const directions = [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]];
+
+    for(const dir of directions) {
+        let currentX = x;
+        let currentY = y;
+
+        while(currentX + dir[0] >= 0 && currentX+dir[0] < seats.length &&
+              currentY + dir[1] >= 0 && currentY+dir[1] < seats[0].length) {
+                const currentPoint = seats[currentX + dir[0]][currentY +dir[1]];
+                if(currentPoint === "#") {
+                    neighbours++;
+                    break;
+                }
+                if(currentPoint === "L")
+                    break;
+
+                currentX = currentX + dir[0];
+                currentY = currentY + dir[1];
+        }
+    }
 
     return neighbours;
 };
@@ -34,7 +38,7 @@ const evaluateField = (seats: string[][], x: number, y: number): string => {
     const neighbours = getNeighbours(seats, x, y);
     if(currentValue === "L" && neighbours === 0) 
         return "#";
-    else if (currentValue === "#" && neighbours >= 4)    
+    else if (currentValue === "#" && neighbours >= 5)    
         return "L";
     return currentValue;
 };
@@ -56,8 +60,6 @@ while(changed) {
 
     seats = seatCopy;
 }
-
-// console.log(seats);
 
 const seatsTaken = seats.reduce((a, e) => { 
     const seatsTakenThisLine = [...e].reduce((aI, eI) => aI = aI + (eI === "#" ? 1 : 0), 0);
