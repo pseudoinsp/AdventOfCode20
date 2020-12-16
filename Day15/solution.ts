@@ -12,7 +12,7 @@ for(const [i, number] of startingNumbers.entries()) {
 
 let lastSpoken = startingNumbers[startingNumbers.length-1];
 
-for (let i = startingNumbers.length; i < 2020; i++) {
+for (let i = startingNumbers.length; i < 30000000; i++) {
     
     const turnNumber = i+1;
     const twoPrevSpoke = spokenNumbersAndTurns.get(lastSpoken);
