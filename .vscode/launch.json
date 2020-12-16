@@ -5,7 +5,7 @@
             "type": "node-terminal",
             "name": "Run Script: day10",
             "request": "launch",
-            "command": "npm run day15",
+            "command": "npm run day16",
             "cwd": "${workspaceFolder}"
         }
     ]
