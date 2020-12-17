@@ -8,19 +8,21 @@ let currentActiveCubes = new Set<string>();
 for (let x = 0; x < data.length; x++) {
     for (let y = 0; y < data[x].length; y++) {
         if (data[x][y] === "#")
-            currentActiveCubes.add(JSON.stringify([x, y, 0]));
+            currentActiveCubes.add(JSON.stringify([x, y, 0, 0]));
     }
 }
 
-const GetNeighboursOfCoordinate = (coordinate: [number, number, number]): Array<[number, number, number]> => {
+const GetNeighboursOfCoordinate = (coordinate: [number, number, number, number]): Array<[number, number, number, number]> => {
 
-    const collectedNeighbours = new Array<[number, number, number]>();
+    const collectedNeighbours = new Array<[number, number, number, number]>();
 
     for (let x = coordinate[0] - 1; x <= coordinate[0]+1; x++) {
         for (let y = coordinate[1] - 1; y <= coordinate[1]+1; y++) {
             for (let z = coordinate[2] - 1; z <= coordinate[2]+1; z++) {
-                if(!(x === coordinate[0] && y === coordinate[1] && z === coordinate[2]))
-                    collectedNeighbours.push([x, y, z]);
+                for (let w = coordinate[3] - 1; w <= coordinate[3] + 1; w++) {
+                    if(!(x === coordinate[0] && y === coordinate[1] && z === coordinate[2] && w === coordinate[3]))
+                        collectedNeighbours.push([x, y, z, w]);
+                }
             }   
         }
     }
@@ -30,7 +32,7 @@ const GetNeighboursOfCoordinate = (coordinate: [number, number, number]): Array<
 
 const simulateCycle = (activeCubes: Set<string>): Set<string> => {
 
-    const relevantCubes = new Set<[number, number, number]>();
+    const relevantCubes = new Set<[number, number, number, number]>();
 
     for(const activeCube of activeCubes) {
         const neighbours = GetNeighboursOfCoordinate(JSON.parse(activeCube));
