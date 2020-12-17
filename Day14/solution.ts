@@ -16,38 +16,25 @@ const retrieveMaskValue = (line: string): string => {
     return line.split('=')[1].substring(1);
 };
 
-// const calculateNewMemoryValue = (mask: string, value: number): number => {
-//     const valueAsString = value.toString(2);
-
-//     const result = new Array<number>();
-
-//     for (let i = mask.length - 1, j = valueAsString.length - 1; i >= 0; i--, j--) {
-//         const numberAtI = parseInt(valueAsString[j]);
-//         const calc = mask[i] !== "X" ? parseInt(mask[i]) : numberAtI || 0;    
-//         result.push(calc);
-//     }
-
-//     const res = result.reverse().join('').toString();
-//     const resNum = parseInt(res, 2);
-//     return resNum;
-// };
-
 const replaceChar = (origString: string, replaceChar: string, index: number): string => {
-    let firstPart = origString.substr(0, index);
-    let lastPart = origString.substr(index + 1);
+    const firstPart = origString.substr(0, index);
+    const lastPart = origString.substr(index + 1);
       
-    let newString = firstPart + replaceChar + lastPart;
+    const newString = firstPart + replaceChar + lastPart;
     return newString;
-}
+};
 
-const reduceVariation = (index: number, variation: string, allVariations : Array<number>) => {
-    const nullVariant = replaceChar(variation, "0", index);
-    const oneVariant = replaceChar(variation, "1", index);
-
-    
-
-    allVariations.push(variation[index] = 0
-}
+const getFloatingBitPermutations = (numberOfFloatingBits: number, current: string, result: Array<string>) => {
+    if(current.length === numberOfFloatingBits) {
+        result.push(current);
+        return;
+    }
+    else {
+        for(const dig of ["0", "1"]) {
+            getFloatingBitPermutations(numberOfFloatingBits, current + dig, result);
+        }
+    }
+};
 
 const generateAddressVariationsFromFloatingAddress = (state: string): Array<number> => {
     const indexesOfX = new Array<number>();
@@ -56,16 +43,21 @@ const generateAddressVariationsFromFloatingAddress = (state: string): Array<numb
             indexesOfX.push(i);  
 
     const addresses = new Array<number>();
+    const floatingBitPermutations = new Array<string>();
+    getFloatingBitPermutations(indexesOfX.length, "", floatingBitPermutations);
 
-    for(const indexofX of indexesOfX) {
-
+    for(const permutation of floatingBitPermutations) {
+        let address = state;
+        for(let j = 0; j < indexesOfX.length; j++) {
+            address = replaceChar(address, permutation[j], indexesOfX[j]);
+        }
+        addresses.push(parseInt(address, 2));
     }
 
-    console.log(indexesOfX);
     return addresses;
 };
 
-const calculateMemoryChanges = (mask: string, address: number, value: number): Array<number> => {
+const calculateMemoryChanges = (mask: string, address: number, value: number) => {
     const addressAsString = address.toString(2);
 
     const result = new Array<string>();
@@ -82,11 +74,8 @@ const calculateMemoryChanges = (mask: string, address: number, value: number): A
 
     const res = result.reverse().join('').toString();
     const memoryAddresses = generateAddressVariationsFromFloatingAddress(res);
-    for(const address of memoryAddresses) {
+    for(const address of memoryAddresses) 
         memory.set(address, value);
-    }
-    // const resNum = parseInt(res, 2);
-    return new Array<number>(value);
 };
 
 let mask = "";
@@ -99,12 +88,9 @@ for (let i = 0; i < data.length; i++) {
     }
     else {
         const memoryInstruction = retrieveMemoryInstruction(data[i]);
-        const newMemoryValue = calculateMemoryChanges(mask, memoryInstruction[0], memoryInstruction[1]);
-        console.log(newMemoryValue);
-        // memory.set(memoryInstruction[0], newMemoryValue);
+        calculateMemoryChanges(mask, memoryInstruction[0], memoryInstruction[1]);
     }
 }
 
-const values = Array.from(memory.values());
-const sumValues = values.reduce((a, e) => a += e, 0);
+const sumValues = [...memory.values()].reduce((a, e) => a += e, 0);
 console.log(`Part 1 - Sum of memory values: ${sumValues}`);
