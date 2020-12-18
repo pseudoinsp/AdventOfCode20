@@ -2,7 +2,7 @@ import { readLines } from '../utils/inputReader';
 
 const data : string[] = readLines('Day18\\input.txt');
 
-const processExpressionWithoutParanthesis = (expression: string, startI: number, endI: number): string => {
+const processExpressionWithoutParantheses = (expression: string, startI: number, endI: number): string => {
     const relvevantPart = expression.substring(startI, endI);
     const parts = relvevantPart.split(' ');
 
@@ -30,7 +30,7 @@ const processExpressionWithoutParanthesis = (expression: string, startI: number,
     return parts[0];
 };
 
-const resolveInternalParentheses = (expression: string): [boolean, string] => {
+const resolveInnermostParentheses = (expression: string): [boolean, string] => {
 
     let exprCopy = expression;
     let paranthesesBegin = -1;
@@ -43,7 +43,7 @@ const resolveInternalParentheses = (expression: string): [boolean, string] => {
             ongoingProcessing = true;
         }
         else if (exprCopy[i] === ")" && ongoingProcessing) {
-            const resolvedPart = processExpressionWithoutParanthesis(exprCopy, paranthesesBegin + 1, i);
+            const resolvedPart = processExpressionWithoutParantheses(exprCopy, paranthesesBegin + 1, i);
             exprCopy = exprCopy.substring(0, paranthesesBegin) + resolvedPart + exprCopy.substring(i+1);
             i = paranthesesBegin;
             ongoingProcessing = false;
@@ -58,12 +58,12 @@ const resolveInternalParentheses = (expression: string): [boolean, string] => {
 const resolveExpression = (expression: string): number => {
     let parenthesisResolveHappened = true;
     while(parenthesisResolveHappened) {
-        const res = resolveInternalParentheses(expression);
+        const res = resolveInnermostParentheses(expression);
         parenthesisResolveHappened = res[0];
         expression = res[1];
     }
 
-    const res = processExpressionWithoutParanthesis(expression, 0, expression.length);
+    const res = processExpressionWithoutParantheses(expression, 0, expression.length);
     return parseInt(res);
 };
 
