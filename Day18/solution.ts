@@ -13,16 +13,13 @@ const processExpressionWithoutParantheses = (expression: string, startI: number,
 
         if(firstSum !== -1) {
             const res = parseInt(parts[firstSum-1]) + parseInt(parts[firstSum+1]);
-            // remove the operator and operands...
-            parts.splice(firstSum-1, 3);
-            // and insert the operation result into their place
-            parts.splice(firstSum-1, 0, res.toString());    
+            // remove the operator and operands, and insert the operation result into their place
+            parts.splice(firstSum-1, 3, res.toString()); 
         }
         else {
             if(parts[1] === "*") { 
                 const res = parseInt(parts[0]) * parseInt(parts[2]);
-                parts.splice(0, 3);
-                parts.splice(0, 0, res.toString());    
+                parts.splice(0, 3, res.toString());
             }
         }
     }
@@ -30,6 +27,7 @@ const processExpressionWithoutParantheses = (expression: string, startI: number,
     return parts[0];
 };
 
+// This method will only resolve a paranthesis if it contains no other parantheses.
 const resolveInnermostParentheses = (expression: string): [boolean, string] => {
 
     let exprCopy = expression;
@@ -42,6 +40,8 @@ const resolveInnermostParentheses = (expression: string): [boolean, string] => {
             paranthesesBegin = i;
             ongoingProcessing = true;
         }
+        // checking for ongoing processing is necessary, cause otherwise we could try to process an outer closer paranthesis without
+        // having an index for its beginning.
         else if (exprCopy[i] === ")" && ongoingProcessing) {
             const resolvedPart = processExpressionWithoutParantheses(exprCopy, paranthesesBegin + 1, i);
             exprCopy = exprCopy.substring(0, paranthesesBegin) + resolvedPart + exprCopy.substring(i+1);
