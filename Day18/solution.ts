@@ -7,19 +7,24 @@ const processExpressionWithoutParanthesis = (expression: string, startI: number,
     const parts = relvevantPart.split(' ');
 
     while(parts.length !== 1) {
-        let res = -1;
-        switch (parts[1]) {
-            case "+":
-                res = parseInt(parts[0]) + parseInt(parts[2]);
-                break;
-            case "*":
-                res = parseInt(parts[0]) * parseInt(parts[2]);
-                break;
+        // solve + parts
+        // this is slower, but dont have to deal with index shifts that would happen if we try to solve them in one iteration
+        const firstSum = parts.findIndex(x => x === "+");
+
+        if(firstSum !== -1) {
+            const res = parseInt(parts[firstSum-1]) + parseInt(parts[firstSum+1]);
+            // remove the operator and operands...
+            parts.splice(firstSum-1, 3);
+            // and insert the operation result into their place
+            parts.splice(firstSum-1, 0, res.toString());    
         }
-        parts.shift();
-        parts.shift();
-        parts.shift();
-        parts.unshift(res.toString());
+        else {
+            if(parts[1] === "*") { 
+                const res = parseInt(parts[0]) * parseInt(parts[2]);
+                parts.splice(0, 3);
+                parts.splice(0, 0, res.toString());    
+            }
+        }
     }
 
     return parts[0];
@@ -68,4 +73,4 @@ for(const expression of data) {
     sumOfExpressions += expressionResult;
 }
 
-console.log(`Part 1 - Sum of all expressions: ${sumOfExpressions}`);
+console.log(`Part 2 - Sum of all expressions: ${sumOfExpressions}`);
