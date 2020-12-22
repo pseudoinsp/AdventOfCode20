@@ -23,7 +23,7 @@ class ReferenceRule implements IRule {
         for(const ruleSequence of this.ownRuleSequences) {
             let remainingPattern = pattern;
             for(const [index, ruleId] of ruleSequence.entries()) {
-                const rule = this.rules[ruleId];
+                const rule = this.rules.find(x => x.id === ruleId) || new SelfDescribedRule(345345, "impossible case");
                 const [matched, remaining] = rule.match(remainingPattern);
                 if(matched) {
                     // console.log(`${pattern} matched on ${rule.id}`);
@@ -74,7 +74,29 @@ const parseInput = (input: string[]): Array<IRule> => {
             const patterns = pattern.split("|");
             const parsedPatterns = patterns.map(x => x.trim()).map(x => x.split(' '));
             const p = parsedPatterns.map(x => x.map(y => parseInt(y)));
+
+            // if(id === 8) {
+            //     p = new Array<Array<number>>();
+            //     for (let i = 10; i >= 1; i--) {
+            //         let recPattern = "42 ".repeat(i);
+            //         recPattern = recPattern.trim();
+            //         const parts = recPattern.split(' ').map(x => parseInt(x));
+            //         p.push(parts);
+            //     }
+            // }
+            // if(id === 11) {
+            //     p = new Array<Array<number>>();
+            //     for (let i = 10; i >= 1; i--) {
+            //         let recPattern = "42 ".repeat(i);
+            //         recPattern += "31 ".repeat(i);
+            //         recPattern = recPattern.trim();
+            //         const parts = recPattern.split(' ').map(x => parseInt(x));
+            //         p.push(parts);
+            //     }
+            // }
+
             const rule = new ReferenceRule(id, p, parsedRules);
+
             parsedRules.push(rule);
         }
     }
@@ -90,8 +112,11 @@ const messages = dataParts[1].split("\r\n");
 let successfulMatches = 0;
 for(const message of messages) {
     const [matched, rem] = rules[0].match(message);
-    if(matched && rem === "")
+    if(matched && rem === "") {
+        console.log(message);
         successfulMatches++;
+    }
+        
     // console.log(`${message} matching rule 0: ${ matched? "yes" : "no"}, remaining: ${rem}`);
 }
 
