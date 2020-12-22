@@ -44,7 +44,9 @@ for(const ingredientList of foodData) {
                 ingredientsDeterminedThisTurn.push(commonIngredients[0]);
         }
         else {
-            allergensAndIngredientCandidates.set(allergen, ingredients);
+            const alreadyDeterminedIngredients = ([...allergensAndIngredientCandidates.entries()]).filter(x => x[1].length === 1).map(x => x[1][0]);
+            const possibleIngredients = ingredients.filter(x => !alreadyDeterminedIngredients.includes(x));
+            allergensAndIngredientCandidates.set(allergen, possibleIngredients);
             if(ingredients.length === 1)
                 ingredientsDeterminedThisTurn.push(ingredients[0]);
         }
@@ -62,6 +64,7 @@ for(const ingredientList of foodData) {
     }
 }
 
+console.log(allergensAndIngredientCandidates);
 const potentialAllergenIngredients = new Set([...allergensAndIngredientCandidates.values()].flat());
 
 const nonAllergenIngredientsAndOccurances = [...ingredientsAndOccurances].filter(x => !potentialAllergenIngredients.has(x[0]));
@@ -69,3 +72,13 @@ const nonAllergenIngredientsAndOccurances = [...ingredientsAndOccurances].filter
 const safeIngredientOccurances = nonAllergenIngredientsAndOccurances.reduce((a, e) => a += e[1], 0);
 
 console.log(`Part 1 - Sum of safe ingredient occurances: ${safeIngredientOccurances}`);
+
+// part 2
+// TODO the mapping is bugged, two allergens have 2 ingredient candidates, was finished manually :)
+const knownAllergenAndIngredientMappings = ([...allergensAndIngredientCandidates.entries()]);
+// const knownAllergenAndIngredientMappings = ([...allergensAndIngredientCandidates.entries()]).filter(x => x[1].length === 1);
+knownAllergenAndIngredientMappings.sort();
+console.log(knownAllergenAndIngredientMappings);
+const dangerousIngredients = [...knownAllergenAndIngredientMappings.map(x => x[1])].flat();
+const dangerousIngredientsList = dangerousIngredients.join(',');
+console.log(`Part 2 - Dangerous ingredients alphabetically: ${dangerousIngredientsList}`);
