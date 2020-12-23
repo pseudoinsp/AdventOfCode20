@@ -27,7 +27,8 @@
     "day18": "ts-node Day18\\solution.ts",
     "day19": "ts-node Day19\\solution.ts",
     "day21": "ts-node Day21\\solution.ts",
-    "day22": "ts-node Day22\\solution.ts"
+    "day22": "ts-node Day22\\solution.ts",
+    "day23": "ts-node Day23\\solution.ts"
   },
   "repository": {
     "type": "git",
