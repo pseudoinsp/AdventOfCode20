@@ -69,7 +69,54 @@ const moveTile = (pos: number[], dir: HexagonDirection): number[] => {
     }
 };
 
-const blackTiles = new Set<string>();
+const getCoordinateStringRepresentation = (coordinate: number[]): string => {
+    return coordinate.join(';');
+};
+
+const getStringRepresentationOfCoordinate = (coordinate: string): number[] => {
+    const coords = coordinate.split(";").map(x => parseInt(x));
+    return [coords[0], coords[1], coords[2]];
+};
+
+const getNeighbourOfCoordinate = (coordinate: number[]): Array<number[]> => {
+    const neighbours = new Array<number[]>();
+
+    neighbours.push([coordinate[0] + 1, coordinate[1] - 1, coordinate[2]]);
+    neighbours.push([coordinate[0] - 1, coordinate[1] + 1, coordinate[2]]);
+    neighbours.push([coordinate[0], coordinate[1] - 1, coordinate[2] + 1]);
+    neighbours.push([coordinate[0] - 1, coordinate[1], coordinate[2] + 1]);
+    neighbours.push([coordinate[0] + 1, coordinate[1], coordinate[2] - 1]);
+    neighbours.push([coordinate[0], coordinate[1] + 1, coordinate[2] - 1]);
+
+    return neighbours;
+};
+
+const simulateDay = (blackTilesTheDayBefore: Set<string>): Set<string> => {
+    const relevantTiles = new Set<number[]>([...blackTilesTheDayBefore].map(x => getNeighbourOfCoordinate(getStringRepresentationOfCoordinate(x))).flat());
+
+    const blackTilesThisDay = new Set<string>();
+
+    for(const relevantTile of relevantTiles) {
+        const neighbours = getNeighbourOfCoordinate(relevantTile);
+
+        const relevantTileAsString = getCoordinateStringRepresentation(relevantTile);
+        const blackAdjacentTiles = neighbours.filter(x => blackTilesTheDayBefore.has(getCoordinateStringRepresentation(x))).length;
+        // Any black tile with zero or more than 2 black tiles immediately adjacent to it is flipped to white.
+        if(blackTilesTheDayBefore.has(relevantTileAsString))  {
+            if(blackAdjacentTiles === 1 || blackAdjacentTiles === 2)
+                blackTilesThisDay.add(relevantTileAsString);
+        }
+        // Any white tile with exactly 2 black tiles immediately adjacent to it is flipped to black.
+        else {
+            if(blackAdjacentTiles === 2)
+                blackTilesThisDay.add(relevantTileAsString);
+        }
+    }
+
+    return blackTilesThisDay;
+};
+
+let blackTiles = new Set<string>();
 
 for(const tileData of tilesData) {
     const directions = parseDirections(tileData);
@@ -79,11 +126,18 @@ for(const tileData of tilesData) {
         currentTile = moveTile(currentTile, direction); 
     }
     
-    const tileHash = currentTile.join(';');
+    const tileHash = getCoordinateStringRepresentation(currentTile);
     if(blackTiles.has(tileHash))
         blackTiles.delete(tileHash);
     else
         blackTiles.add(tileHash);
 }
 
-console.log(`Part 1 - Number of black tiles: ${blackTiles.size}`);
+console.log(`Part 1 - Number of black tiles on day 0: ${blackTiles.size}`);
+
+// part 2 
+for (let i = 1; i <= 100; i++) {
+    blackTiles = simulateDay(blackTiles);
+}
+
+console.log(`Part 2 - Black tiles after on day 100: ${blackTiles.size}`);
