@@ -4,20 +4,26 @@ const data : string = readInput('Day23\\input.txt');
 
 const cups = data.split('').map(x => parseInt(x));
 
+for (let i = 10; i <= 1000000; i++) {
+    cups.push(i);
+}
+
 const rotateArray = (array: number[], count: number): number[] => {
     return [...array.slice(count, array.length), ...array.slice(0, count)];
 };
 
 let round = 1;
 const simulateMove = (cups: number[], currentCupIndex: number): [number[], number] => {
-    console.log(`Round ${round++}: cups: ${cups.toString()},current cup: ${cups[currentCupIndex]}`);
+    // console.log(`Round ${round++}: cups: ${cups.toString()},current cup: ${cups[currentCupIndex]}`);
+    if(round++ % 100 === 0)
+        console.log(`Round ${round++}`);
     if(currentCupIndex >= cups.length - 3) {
         cups = rotateArray(cups, 3);
         currentCupIndex -= 3;
     }
     const currentCup = cups[currentCupIndex];
     const removedCups = cups.splice(currentCupIndex + 1, 3);
-    console.log(`pick up: ${removedCups.toString()}`);
+    // console.log(`pick up: ${removedCups.toString()}`);
     const remainingCups = cups;
     let destinationCupIndex = -1;
 
@@ -37,7 +43,11 @@ const simulateMove = (cups: number[], currentCupIndex: number): [number[], numbe
     if(newCurrentCupIndex === remainingCups.length)
         newCurrentCupIndex = 0;
 
-    console.log(`destination: ${remainingCups[destinationCupIndex]}`);
+    const cup1Location = remainingCups.findIndex(x => x === 1);
+    if (remainingCups[cup1Location+1] !== 3 || remainingCups[cup1Location+2] !== 10)
+        console.log(`${remainingCups[cup1Location+1]}, ${remainingCups[cup1Location+2]}`);
+
+    // console.log(`destination: ${remainingCups[destinationCupIndex]}`);
 
     return [remainingCups, newCurrentCupIndex];
 };
@@ -45,7 +55,7 @@ const simulateMove = (cups: number[], currentCupIndex: number): [number[], numbe
 let cupState = cups;
 let currentCup = 0;
 
-for(let i = 0; i < 100; i++)  {
+for(let i = 0; i < 10000000; i++)  {
     const [ newCupState, newCurrentCup ] = simulateMove(cupState, currentCup);
     cupState = newCupState;
     currentCup = newCurrentCup;
