@@ -69,16 +69,16 @@ const moveTile = (pos: number[], dir: HexagonDirection): number[] => {
     }
 };
 
-const getCoordinateStringRepresentation = (coordinate: number[]): string => {
+const getStringRepresentationOfCoordinate = (coordinate: number[]): string => {
     return coordinate.join(';');
 };
 
-const getStringRepresentationOfCoordinate = (coordinate: string): number[] => {
+const getCoordinateFromStringRepresentation = (coordinate: string): number[] => {
     const coords = coordinate.split(";").map(x => parseInt(x));
     return [coords[0], coords[1], coords[2]];
 };
 
-const getNeighbourOfCoordinate = (coordinate: number[]): Array<number[]> => {
+const getNeighboursOfCoordinate = (coordinate: number[]): Array<number[]> => {
     const neighbours = new Array<number[]>();
 
     neighbours.push([coordinate[0] + 1, coordinate[1] - 1, coordinate[2]]);
@@ -92,15 +92,16 @@ const getNeighbourOfCoordinate = (coordinate: number[]): Array<number[]> => {
 };
 
 const simulateDay = (blackTilesTheDayBefore: Set<string>): Set<string> => {
-    const relevantTiles = new Set<number[]>([...blackTilesTheDayBefore].map(x => getNeighbourOfCoordinate(getStringRepresentationOfCoordinate(x))).flat());
+    const relevantTiles = new Set<number[]>([...blackTilesTheDayBefore].map(x => getNeighboursOfCoordinate(getCoordinateFromStringRepresentation(x))).flat());
+    blackTilesTheDayBefore.forEach(x => relevantTiles.add(getCoordinateFromStringRepresentation(x)));
 
     const blackTilesThisDay = new Set<string>();
 
     for(const relevantTile of relevantTiles) {
-        const neighbours = getNeighbourOfCoordinate(relevantTile);
+        const neighbours = getNeighboursOfCoordinate(relevantTile);
 
-        const relevantTileAsString = getCoordinateStringRepresentation(relevantTile);
-        const blackAdjacentTiles = neighbours.filter(x => blackTilesTheDayBefore.has(getCoordinateStringRepresentation(x))).length;
+        const relevantTileAsString = getStringRepresentationOfCoordinate(relevantTile);
+        const blackAdjacentTiles = neighbours.filter(x => blackTilesTheDayBefore.has(getStringRepresentationOfCoordinate(x))).length;
         // Any black tile with zero or more than 2 black tiles immediately adjacent to it is flipped to white.
         if(blackTilesTheDayBefore.has(relevantTileAsString))  {
             if(blackAdjacentTiles === 1 || blackAdjacentTiles === 2)
@@ -126,7 +127,7 @@ for(const tileData of tilesData) {
         currentTile = moveTile(currentTile, direction); 
     }
     
-    const tileHash = getCoordinateStringRepresentation(currentTile);
+    const tileHash = getStringRepresentationOfCoordinate(currentTile);
     if(blackTiles.has(tileHash))
         blackTiles.delete(tileHash);
     else
