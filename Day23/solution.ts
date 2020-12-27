@@ -2,69 +2,57 @@ import { readInput } from '../utils/inputReader';
 
 const data : string = readInput('Day23\\input.txt');
 
-const cups = data.split('').map(x => parseInt(x));
-
-for (let i = 10; i <= 1000000; i++) {
-    cups.push(i);
+interface Cup {
+    value: number,
+    next?: Cup | undefined
 }
 
-const rotateArray = (array: number[], count: number): number[] => {
-    return [...array.slice(count, array.length), ...array.slice(0, count)];
-};
+const arraySize = 1_000_000;
+const cups = new Array<Cup>(arraySize);
+const input = data.split('').map(x => parseInt(x));
+for (let i = input.length + 1; i <= arraySize; i++) {
+    input.push(i);    
+}
 
-let round = 1;
-const simulateMove = (cups: number[], currentCupIndex: number): [number[], number] => {
-    // console.log(`Round ${round++}: cups: ${cups.toString()},current cup: ${cups[currentCupIndex]}`);
-    if(round++ % 100 === 0)
-        console.log(`Round ${round++}`);
-    if(currentCupIndex >= cups.length - 3) {
-        cups = rotateArray(cups, 3);
-        currentCupIndex -= 3;
-    }
-    const currentCup = cups[currentCupIndex];
-    const removedCups = cups.splice(currentCupIndex + 1, 3);
-    // console.log(`pick up: ${removedCups.toString()}`);
-    const remainingCups = cups;
-    let destinationCupIndex = -1;
+const last: Cup = {value: arraySize, next: undefined};
+cups[arraySize] = last;
+let lastAdded = last;
+for (let i = arraySize - 1; i > 0; i--) {
+    const current: Cup = ({value: input[i-1], next: lastAdded});
+    cups[current.value] = current;
+    lastAdded = current;
+}
+last.next = cups[input[0]];
 
-    const cupsAndIndexes = remainingCups.map((x, i) => [x, i]);
-    cupsAndIndexes.sort((x, y) => x[0] - y[0]);
-    const indexOfCurrentCupSorted = cupsAndIndexes.findIndex(x => x[0] === currentCup);
-    if(indexOfCurrentCupSorted === 0) {
-        destinationCupIndex = cupsAndIndexes[cupsAndIndexes.length - 1][1];
-    }
-    else {
-        destinationCupIndex = cupsAndIndexes[indexOfCurrentCupSorted-1][1];
-    }
-    
+const simulateMove = (cups: Array<Cup>, currentCup: Cup): [Array<Cup>, Cup] => {
+    let removedCups = new Array<Cup>();
+    if(currentCup.next && currentCup.next.next && currentCup.next.next.next)
+         removedCups = [ currentCup.next, currentCup.next.next, currentCup.next.next.next];
+    currentCup.next = removedCups[2].next;
+    const destinationValue = currentCup.value > 1 ? currentCup.value - 1 : arraySize;
+    let destination = cups[destinationValue];
+    while(removedCups.includes(destination))
+        destination = cups[destination.value > 1 ? destination.value - 1 : arraySize];
 
-    remainingCups.splice(destinationCupIndex + 1, 0, ...removedCups);
-    let newCurrentCupIndex = remainingCups.findIndex(x =>x === currentCup) + 1;
-    if(newCurrentCupIndex === remainingCups.length)
-        newCurrentCupIndex = 0;
+    if(removedCups[2])
+        removedCups[2].next = destination.next;
 
-    const cup1Location = remainingCups.findIndex(x => x === 1);
-    if (remainingCups[cup1Location+1] !== 3 || remainingCups[cup1Location+2] !== 10)
-        console.log(`${remainingCups[cup1Location+1]}, ${remainingCups[cup1Location+2]}`);
+    destination.next = removedCups[0];
 
-    // console.log(`destination: ${remainingCups[destinationCupIndex]}`);
+    const newCurrent = currentCup.next || cups[0];
 
-    return [remainingCups, newCurrentCupIndex];
+    return [ cups, newCurrent ];
 };
 
 let cupState = cups;
-let currentCup = 0;
+let currentCup = cups[input[0]];
 
-for(let i = 0; i < 10000000; i++)  {
+for(let i = 0; i <= 10_000_000; i++)  {
     const [ newCupState, newCurrentCup ] = simulateMove(cupState, currentCup);
     cupState = newCupState;
     currentCup = newCurrentCup;
 }
 
-// Part 1
-const indexOf1 = cupState.indexOf(1);
-const firstPart = cupState.slice(indexOf1 + 1);
-const secondPart = cupState.slice(0, indexOf1);
-const numbersInOrder = firstPart.concat(secondPart);
-
-console.log(`Part 1 - Order of numbers, right from 1: ${numbersInOrder.join('')}`);
+// part 2
+if(cupState[1].next && cupState[1].next.next)
+    console.log(`Part 2 - ${(cupState[1].next.value) * (cupState[1].next.next.value)}`);
